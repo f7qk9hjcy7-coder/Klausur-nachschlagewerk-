@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Klausur-Nachschlagewerk · WMKE25A</title>
+<style>
+  :root{
+    --paper:#faf8f4; --card:#ffffff;
+    --ink:#1b1a18; --ink-soft:#4f4b44; --ink-faint:#8a857c;
+    --line:#e7e2d8; --line-soft:#f0ece3;
+    --vdl:#c8102e; --vdl-bg:#fdf0f1;
+    --tour:#0e7c6b; --tour-bg:#eaf6f3;
+    --messe:#2a4d8f; --messe-bg:#edf1f9;
+    --shadow:0 1px 2px rgba(40,35,25,.05), 0 6px 22px rgba(40,35,25,.06);
+    --radius:16px;
+    --bar-h:160px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.58;-webkit-font-smoothing:antialiased;
+    padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  /* ---------- slim top brand ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:20;background:rgba(250,248,244,.92);
+    backdrop-filter:saturate(150%) blur(8px);border-bottom:1px solid var(--line);
+    padding:9px 16px;padding-top:max(9px,env(safe-area-inset-top));
+  }
+  .topbar .eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint)}
+
+  /* ---------- main ---------- */
+  main{max-width:760px;margin:0 auto;padding:4px 16px 0}
+
+  .mod-head{margin:22px 2px 14px;display:flex;align-items:center;gap:13px}
+  .mod-head .bar{width:6px;height:46px;border-radius:4px}
+  .mod-head h2{font-size:23px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1}
+  .mod-head .sub{font-size:12.5px;color:var(--ink-faint);font-weight:600;margin-top:3px}
+  .mod-vdl .bar{background:var(--vdl)} .mod-tour .bar{background:var(--tour)} .mod-messe .bar{background:var(--messe)}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    margin:9px 0;box-shadow:var(--shadow);overflow:hidden;border-left:4px solid var(--edge);
+  }
+  .card.vdl{--edge:var(--vdl);--acc:var(--vdl);--accbg:var(--vdl-bg)}
+  .card.tour{--edge:var(--tour);--acc:var(--tour);--accbg:var(--tour-bg)}
+  .card.messe{--edge:var(--messe);--acc:var(--messe);--accbg:var(--messe-bg)}
+  .card-btn{
+    width:100%;text-align:left;border:0;background:transparent;cursor:pointer;
+    padding:16px;display:flex;align-items:center;gap:12px;font-family:inherit;color:var(--ink);
+  }
+  .num{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:var(--accbg);color:var(--acc);
+    font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .ttl{font-size:16px;font-weight:700;letter-spacing:-.01em;flex:1;line-height:1.35}
+  .chev{flex:0 0 auto;width:19px;height:19px;stroke:var(--ink-faint);transition:transform .2s}
+  .card.open .chev{transform:rotate(180deg)}
+  .body{display:none;padding:0 16px 18px;animation:fade .18s ease}
+  .card.open .body{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+
+  .def{font-size:15.5px;color:var(--ink);background:var(--accbg);border-radius:11px;
+    padding:13px 14px;margin:2px 0 16px;line-height:1.55}
+  .lbl{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin:16px 0 7px}
+  ul.kern{margin:0;padding:0;list-style:none}
+  ul.kern li{position:relative;padding:5px 0 5px 18px;font-size:15px;color:var(--ink-soft);line-height:1.56}
+  ul.kern li::before{content:"";position:absolute;left:2px;top:13px;width:6px;height:6px;border-radius:50%;background:var(--acc);opacity:.5}
+  ul.kern li b{color:var(--ink);font-weight:700}
+  .formula{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;
+    background:#1b1a18;color:#f4f1ea;padding:12px 14px;border-radius:10px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+  .ex{font-size:14.5px;color:var(--ink-soft);border-left:3px solid var(--line);padding:3px 0 3px 13px;font-style:italic;line-height:1.55}
+
+  .empty{text-align:center;color:var(--ink-faint);padding:50px 20px;font-size:15px;display:none}
+  .empty.show{display:block}
+  .empty svg{width:34px;height:34px;stroke:var(--line);margin-bottom:10px}
+  .hidden{display:none!important}
+  mark{background:#ffe9a8;color:inherit;border-radius:3px;padding:0 1px}
+
+  /* ---------- fixed bottom nav ---------- */
+  .dock{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:rgba(250,248,244,.96);backdrop-filter:saturate(160%) blur(10px);
+    border-top:1px solid var(--line);
+    padding:11px 16px calc(11px + env(safe-area-inset-bottom));
+    box-shadow:0 -4px 24px rgba(40,35,25,.07);
+  }
+  .searchbox{position:relative;display:flex;align-items:center;margin-bottom:10px}
+  .searchbox svg.ic{position:absolute;left:15px;width:20px;height:20px;stroke:var(--ink-faint);pointer-events:none}
+  #search{
+    width:100%;padding:15px 46px 15px 46px;border:1.5px solid var(--line);border-radius:14px;
+    background:var(--card);font-size:16px;color:var(--ink);outline:none;font-family:inherit;
+  }
+  #search:focus{border-color:var(--ink-soft);box-shadow:0 0 0 3px rgba(27,26,24,.06)}
+  #clear{position:absolute;right:9px;border:0;background:transparent;cursor:pointer;
+    width:34px;height:34px;border-radius:9px;display:none;align-items:center;justify-content:center;color:var(--ink-faint)}
+  #clear.show{display:flex}
+  #clear:hover{background:var(--line-soft)}
+
+  .modnav{display:flex;gap:9px}
+  .mbtn{
+    flex:1;min-height:56px;border:1.5px solid var(--line);background:var(--card);
+    border-radius:14px;cursor:pointer;font-family:inherit;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    padding:6px 4px;transition:.12s;color:var(--ink-soft);
+  }
+  .mbtn .mn{font-size:14.5px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:7px}
+  .mbtn .mn .dot{width:9px;height:9px;border-radius:50%}
+  .mbtn[data-m="vdl"] .dot{background:var(--vdl)}
+  .mbtn[data-m="tour"] .dot{background:var(--tour)}
+  .mbtn[data-m="messe"] .dot{background:var(--messe)}
+  .mbtn .mc{font-size:11px;font-weight:600;color:var(--ink-faint)}
+  .mbtn.active[data-m="vdl"]{background:var(--vdl);border-color:var(--vdl)}
+  .mbtn.active[data-m="tour"]{background:var(--tour);border-color:var(--tour)}
+  .mbtn.active[data-m="messe"]{background:var(--messe);border-color:var(--messe)}
+  .mbtn.active,.mbtn.active .mc{color:#fff}
+  .mbtn.active .mc{opacity:.8}
+  .mbtn.active .dot{background:#fff!important}
+
+  @media (max-width:380px){
+    .mbtn .mn{font-size:13px}
+    .mod-head h2{font-size:20px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap"><div class="eyebrow">Klausur-Spickzettel · WMKE25A · 120 Min · 100 P</div></div></div>
+
+<main id="main"></main>
+<div class="empty" id="empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+  <div>Kein Thema gefunden.<br>Versuch einen anderen Begriff.</div>
+</div>
+
+<div class="dock">
+  <div class="wrap">
+    <div class="searchbox">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+      <input id="search" type="search" placeholder="Thema oder Begriff suchen …" autocomplete="off" enterkeyhint="search">
+      <button id="clear" aria-label="Suche löschen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modnav" id="modnav">
+      <button class="mbtn active" data-m="vdl"><span class="mn"><span class="dot"></span>VDL</span><span class="mc" id="c-vdl"></span></button>
+      <button class="mbtn" data-m="tour"><span class="mn"><span class="dot"></span>Tourismus</span><span class="mc" id="c-tour"></span></button>
+      <button class="mbtn" data-m="messe"><span class="mn"><span class="dot"></span>Messebau</span><span class="mc" id="c-messe"></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MODULES = {
+  vdl:   {name:"Veranstaltungsdienstleistung", sub:"Prof. Dr. Maren Rottler · ~34 Punkte", cls:"mod-vdl"},
+  tour:  {name:"Tourismus & Destinationsmanagement", sub:"Christine Mende · ~33 Punkte", cls:"mod-tour"},
+  messe: {name:"Ausstellerbeteiligung & Messebau", sub:"~33 Punkte", cls:"mod-messe"}
+};
+
+const DATA = [
+/* ===================== VDL ===================== */
+{m:"vdl",t:"Charakteristika von Dienstleistungen",
+ def:"Dienstleistungen unterscheiden sich von Sachgütern durch drei zentrale Charakteristika, die jeweils eine spezifische Herausforderung für das Management mit sich bringen: Immaterialität, Integration des externen Faktors und das Uno-actu-Prinzip.",
+ kern:["<b>Immaterialität:</b> Dienstleistungen sind nicht greifbar und vor dem Kauf kaum prüfbar. Daraus folgt ein (gefühlt) höheres wahrgenommenes Kaufrisiko gegenüber Sachgütern; der Anbieter muss Vertrauen und Qualitätssignale schaffen (z. B. Referenzen, Marke, physische Evidenzen).",
+   "<b>Integration des externen Faktors:</b> Der Kunde selbst oder eines seiner Objekte wird in den Erstellungsprozess eingebracht und wirkt aktiv mit. Folge: erschwerte Standardisierung und Qualitätskontrolle, da das Ergebnis vom Verhalten und Input des Kunden abhängt.",
+   "<b>Uno-actu-Prinzip (Gleichzeitigkeit):</b> Produktion (Leistungserstellung) und Konsum (Leistungsabgabe) fallen zeitlich zusammen und sind untrennbar. Folge: Unteilbarkeit, mangelnde Lagerfähigkeit und Standortgebundenheit – nicht genutzte Kapazität ist unwiederbringlich verloren."],
+ ex:"NotG: Das Abschlussfeier-Erlebnis ist immateriell, die Gäste (externer Faktor) müssen anwesend sein, und Durchführung und Erleben finden gleichzeitig statt; ein leerer Platz lässt sich nicht nachträglich verkaufen."},
+
+{m:"vdl",t:"Drei konstitutive Merkmale (nach Hilke)",
+ def:"Die drei konstitutiven Merkmale nach Hilke beschreiben eine Dienstleistung phasenbezogen über ihren gesamten Erstellungsverlauf hinweg als Potenzial-, Prozess- und Ergebnisorientierung. Sie sind eng mit den drei Charakteristika verknüpft.",
+ kern:["<b>Potenzialorientierung (Input):</b> Der Anbieter stellt seine Leistungsfähigkeit und -bereitschaft bereit, z. B. qualifiziertes Personal, Geschäftsräume, Ausstattung. Es liegt zunächst nur ein Leistungsversprechen vor → verknüpft mit der Immaterialität.",
+   "<b>Prozessorientierung (Prozess):</b> Interne Faktoren (im Einflussbereich des Anbieters) und externe Faktoren (Kunde/Objekt, nicht steuerbar) werden im Erstellungsprozess kombiniert (Faktorkombination) → verknüpft mit der Integration des externen Faktors.",
+   "<b>Ergebnisorientierung (Output):</b> Am externen Faktor – an Menschen (z. B. Kunden) oder deren Objekten – entsteht eine nutzenstiftende Wirkung → verknüpft mit dem Uno-actu-Prinzip.",
+   "<b>Definition:</b> Dienstleistungen sind selbstständige, marktfähige Leistungen, die mit der Bereitstellung und/oder dem Einsatz von Leistungsfähigkeiten verbunden sind (Potenzial); interne und externe Faktoren werden im Erstellungsprozess kombiniert (Prozess), um an den externen Faktoren nutzenstiftende Wirkungen zu erzielen (Ergebnis)."],
+ ex:"NotG: bereitgestellte Location und Eventteam (Potenzial) → Durchführung gemeinsam mit den Gästen (Prozess) → erlebte, gelungene Abschlussfeier (Ergebnis)."},
+
+{m:"vdl",t:"Aktuelle Trends bei Dienstleistungen",
+ def:"Dienstleistungen entwickeln sich entlang mehrerer gesellschaftlicher, wirtschaftlicher und technologischer Treiber laufend weiter; das Management muss diese Trends erkennen und auf Veranstaltungsdienstleistungen übertragen.",
+ kern:["<b>Zentrale Treiber:</b> demografische Entwicklungen, gesellschaftliche Entwicklungen, Entwicklung der Märkte, verändertes Nachfrageverhalten, technologische Entwicklungen und nachhaltige Entwicklung.",
+   "<b>Twin Transformation:</b> Die parallele und verknüpfte Bewältigung von Digitalisierung und Nachhaltigkeit gilt als Leittrend – beide Transformationen werden zusammen gedacht statt getrennt.",
+   "<b>Nachhaltige Entwicklung (Brundtland 1987):</b> eine Entwicklung, „die den Bedürfnissen der heutigen Generation entspricht, ohne die Möglichkeiten künftiger Generationen zu gefährden“. Auf Events übertragen ergeben sich ökologische, soziale und ökonomische Handlungsfelder."],
+ ex:"Die MICE-Branche (Meetings, Incentives, Conventions, Events) setzt zunehmend auf hybride, ressourcenschonende Formate, die digitale Reichweite mit nachhaltiger Durchführung verbinden."},
+
+{m:"vdl",t:"Vier theoretische Sichtweisen (IL · SL · SDL · CDL)",
+ def:"Das heutige Verständnis von Dienstleistungsprozessen (DLP) ist die Summe vier theoretischer Schulen, die sich historisch ablösen und ergänzen. Sie unterscheiden sich vor allem in Perspektive, Ort der Wertentstehung und Aufgabe des Managements.",
+ kern:["<b>IL – Integrative Leistungslehre</b> (ab 1960er, Berliner Schule: Engelhardt, Fleiß, Kleinaltenkamp): anbieterzentriert. Es gibt autonome (Anbieter entscheidet) und integrative (Kundenmitwirkung) Leistungsprozesse; Dienstleistungen sind immer integrativ, der Kunde ist ein externer Produktionsfaktor/Ressource. Aufgabe: effektive und effiziente Integration des Kunden.",
+   "<b>SL – Service Logic</b> (ab 1970er, Nordic School: Grönroos, Gummesson): anbieterzentriert. Interaktionsprozesse von Anbieter und Kunde sind auf Wertgenerierung ausgerichtet. Der Wert wird vom Kunden erzeugt; der Anbieter ist Value Facilitator, Co-Creation entsteht durch Interaktion. Aufgabe: Interaktionen/Kontaktpunkte (service encounters) optimal gestalten.",
+   "<b>SDL – Service-Dominant Logic</b> (ab 2000er, USA: Vargo, Lusch): Vogelperspektive auf Akteure (Rollen von Anbieter und Kunde können wechseln). Werterzeugung durch Austausch von Services (Value Co-Creation); der Anbieter gibt ein Leistungsversprechen (Service Proposition), der Wert entsteht erst durch die Nutzung. Aufgabe: Zusammenarbeit zur Werterzeugung.",
+   "<b>CDL – Customer-Dominant Logic</b> (ab 2010er, Nordic School: Heinonen, Strandvik): der Kunde in seiner eigenen Lebenswelt steht im Mittelpunkt. Die DLP haben unterschiedlich großen Anteil an den Wertgenerierungsprozessen im Leben des Kunden. Aufgabe: DLP so gestalten, dass sie diese Prozesse unterstützen."],
+ ex:"SDL bei NotG: Die DHBW/der Freundeskreis gibt mit der Veranstaltung ein Leistungsversprechen; der eigentliche Wert (Feiern, Stolz, Vernetzung) entsteht erst durch die aktive Teilnahme der Gäste."},
+
+{m:"vdl",t:"Formen der Kundenmitwirkung",
+ def:"Da Dienstleistungen integrativ sind, können Kund:innen in unterschiedlichen Phasen und mit unterschiedlicher Intensität in den Dienstleistungsprozess eingebunden werden – von der Entwicklung bis zur Vermarktung.",
+ kern:["<b>Co-Development / Co-Design / Open (Service) Innovation:</b> Mitwirkung des Kunden bereits bei der Entwicklung der Dienstleistung.",
+   "<b>Mass Customization:</b> Zusammenstellung eines individuellen Angebots aus standardisierten Teilprozessen und Teilangeboten – Individualität trifft auf Standardisierung.",
+   "<b>Co-Produktion:</b> Mitwirkung des Kunden bei der eigentlichen Erstellung der Dienstleistung.",
+   "<b>Self-Service:</b> der Kunde übernimmt selbst Aufgaben, die sonst der Anbieter erbringt.",
+   "<b>Co-Marketing:</b> Aktivitäten des Kunden in der Vermarktungsphase, z. B. Weiterempfehlung oder das Teilen von Inhalten."],
+ ex:"NotG: Gäste posten und verbreiten Inhalte in Social Media (Co-Marketing), nutzen einen digitalen Self-Check-in (Self-Service) oder bringen bei der Konzeption Ideen ein (Co-Design)."},
+
+{m:"vdl",t:"Struktur des DLP & Service Blueprint",
+ def:"Der Service Blueprint ist ein Instrument zur Visualisierung und Analyse des Dienstleistungsprozesses über die Zeit. Er stellt Kunden- und Anbieteraktivitäten parallel dar und trennt sie durch definierte Linien, sodass sichtbare und unsichtbare Prozessteile erkennbar werden.",
+ kern:["<b>Drei Linien:</b> Die Interaktionslinie (line of interaction) trennt Kunden- von Anbieteraktivitäten; die Sichtbarkeitslinie (line of visibility) trennt für den Kunden Sichtbares (onstage) von Unsichtbarem (backstage); die interne Interaktionslinie trennt Backstage-Aktivitäten von Support-/Vorbereitungsprozessen.",
+   "<b>Bestandteile:</b> Kundenaktivitäten, physische Evidenzen, Onstage-Kontaktpersonen, Backstage-Aktivitäten und Unterstützungsprozesse.",
+   "<b>Drei Phasen:</b> Der Dienstleistungsprozess gliedert sich in Pre-Service-Phase (Wertgenerierung & Service Process Design), Service-Phase (Service Experience, Interaktionen) und Post-Service-Phase (nachbereitende Aktivitäten)."],
+ ex:"NotG-Blueprint: Empfang, Bühnenshow und Catering sind onstage; Technik, Logistik und Ablaufkoordination laufen backstage hinter der Sichtbarkeitslinie."},
+
+{m:"vdl",t:"Ziele & Aufgaben des Managements (Effizienz vs. Effektivität)",
+ def:"Das Management von Dienstleistungsprozessen ordnet sich in eine Zielhierarchie ein: zentrales Ziel ist die Gewinnerzielung, darunter stehen strategische und operative Ziele. Operativ stehen sich Effektivität und Effizienz gegenüber.",
+ kern:["<b>Zielhierarchie:</b> Zentrales Ziel ist die Gewinnerzielung; strategisches Ziel ist die Erhaltung und Weiterentwicklung dauerhafter Wettbewerbsvorteile durch Differenzierung und Stärkung von Kunden- und Ressourcenvorteil.",
+   "<b>Effektivität („die richtigen Dinge tun“):</b> Ein DLP ist effektiv, wenn die Ressourcen des Anbieters so eingesetzt werden, dass sie der Wertgenerierung des Kunden dienen und gleichzeitig ein angemessener Value-in-Exchange entsteht. Zielgrößen: z. B. Value-in-Use, Dauer des Prozesses.",
+   "<b>Effizienz („die Dinge richtig tun“):</b> Ein DLP ist effizient, wenn mit gegebenen Ressourcen kein höherer Output erzielbar ist bzw. ein gegebener Output nicht mit weniger Ressourcen erreichbar ist. Zielgrößen: z. B. Kosten, Wirtschaftlichkeit, Produktivität."],
+ ex:"NotG effektiv = ein Erlebnis, das genau zur Zielgruppe der Absolvent:innen passt; effizient = standardisierter, schlanker Auf- und Abbau mit minimalem Ressourceneinsatz."},
+
+{m:"vdl",t:"Wertgenerierung: Kunden- vs. Anbieterlogik & Werttypen",
+ def:"Im Zentrum moderner Dienstleistungsprozesse steht die gemeinsame Wertgenerierung. Kunden- und Anbieterlogik beantworten die Fragen Was, Wer, Wann, Wie und Wo Wert entsteht unterschiedlich; zusätzlich lassen sich verschiedene Werttypen unterscheiden.",
+ kern:["<b>Kundenlogik:</b> Wert ist das Ergebnis eines Bewertungsprozesses mit Ziel Wohlergehen (Well-Being). Wert ist subjektiv, relativ, temporär und kontextabhängig und entsteht in bzw. während der Nutzung.",
+   "<b>Anbieterlogik:</b> Wert bedeutet Gewinnerzielung über einen dauerhaften Wettbewerbsvorteil. Der Anbieter konzipiert das Servicesystem und die Wertschöpfungskonfigurationen; der Wert realisiert sich, wenn der Kunde diese nutzt.",
+   "<b>Werttypen aus Kundensicht:</b> Value-in-Use (Nutzwert durch die Nutzung), Value-in-Experience (vom Kunden erfahrener Wert), Value-in-Context (durch sozialen/kulturellen Kontext beeinflusster Wert).",
+   "<b>Drei Grundtypen am Markt:</b> utilitaristischer Wert („sich besserstellen“, funktionale Problemlösung), hedonistischer Wert („sich besser fühlen“, Freude/Erlebnis/Entspannung, multisensorisch), sozialer Wert („sich sozial fühlen“, Beziehungen knüpfen/stärken)."],
+ ex:"Die NotG spricht vor allem den hedonistischen Wert (Feiern, Spaß) und den sozialen Wert (gemeinsames Erleben, Stolz, Vernetzung) an; ein utilitaristischer Aspekt ist die offizielle Würdigung des Abschlusses."},
+
+{m:"vdl",t:"Service Process Design (SPD)",
+ def:"Service Process Design ist die Gestaltung des Dienstleistungsprozesses. Hauptaufgabe ist es, die Kunden- und Anbieterperspektive, die sich in der gemeinsamen Sphäre (Joint Sphere) begegnen, aufeinander abzustimmen und Konflikte zu vermeiden – getrennt nach Effektivitäts- und Effizienzgestaltung.",
+ kern:["<b>SPD für Effektivität</b> (Wert für den Kunden erhöhen): Verbesserung der Kosten-Nutzen-Wahrnehmung, Sicherung von Gerechtigkeit in der Behandlung der Kund:innen und gezielte Gestaltung der Joint Sphere/Interaktionen in der Service-Phase.",
+   "<b>Gestaltung der Joint Sphere:</b> Anpassung der Sichtbarkeitslinie (nutzenerhöhende Aktivitäten in den sichtbaren Bereich, nutzensenkende dahinter), Gestaltung des sichtbaren Bereichs (z. B. gute Orientierung durch Hinweisschilder) und Anpassung der Interaktionslinie (Externalisierung/Internalisierung von Aktivitäten, die den Kunden entlasten).",
+   "<b>SPD für Effizienz</b> (Kosten/Produktivität): Standardisierung & Modularisierung, Automatisierung, Externalisierung, Outsourcing; Kapazitätssteuerung (Kapazitätsflexibilisierung, Glättung von Nachfrageschwankungen) sowie indirekte Steuerung des Kundeninputs (Kundenselektion, Customer Enablement, Prozesssegmentierung)."],
+ ex:"NotG: digitaler Self-Check-in als Externalisierung (Effizienz) sowie gut sichtbare Beschilderung und kurze Wege zur Erhöhung des Kundennutzens (Effektivität)."},
+
+{m:"vdl",t:"Service Experience & Experience Management/Design",
+ def:"Die Service Experience umfasst das Erleben – die Wahrnehmung und Verarbeitung dessen, was im Moment passiert – und das Erfahren – die Interpretation und Reflexion des Erlebten – eines Kunden im Service-Co-Creation-Prozess.",
+ kern:["<b>Entstehung:</b> Der Kunde führt körperliche Aktivitäten aus und interagiert mit Objekten (physische Dimension) und anderen Akteuren (soziale Dimension); Sinneseindrücke werden verarbeitet (sensorische Dimension) und kognitiv/affektiv weiterverarbeitet. Dabei entstehen Emotionen (affektive Dimension) und Bewertungen (kognitive Dimension); durch Sinnzuschreibung wird das Erlebte zur gespeicherten Erfahrung.",
+   "<b>Service Experience Management:</b> Der Anbieter gestaltet und steuert mit dem Service Experience Design den Co-Creation-Prozess, um eine positive Service Experience zu ermöglichen.",
+   "<b>Service Experience Design (SED):</b> Prozessgestaltung, die Erlebnis und Erfahrung der Kund:innen ins Zentrum stellt – bei utilitaristischen DL funktional/aufgabenorientiert, bei hedonistischen DL erlebnisorientiert und die Sinne ansprechend."],
+ ex:"NotG-SED: eine abgestimmte Licht-, Musik- und Bühnendramaturgie (hedonistisch) erzeugt ein emotional starkes, erinnerbares Abschlusserlebnis."},
+
+{m:"vdl",t:"Servicescape (Dienstleistungsumgebung)",
+ def:"Die Servicescape ist der Raum, in dem die Aktivitäten und Interaktionen im Rahmen des Service-Co-Creation-Prozesses stattfinden. Sie ist ein zentrales Gestaltungselement der Service Experience.",
+ kern:["Sie umfasst die physische und atmosphärische Gestaltung der Dienstleistungsumgebung – Raum, Ausstattung, Licht, Klang und Wegeführung.",
+   "Sie beeinflusst Wahrnehmung, Emotionen und Verhalten sowohl der Kund:innen als auch des Personals und kann die Service Experience gezielt fördern."],
+ ex:"Foyer, Bühnenbereich, Beleuchtung und Akustik des NotG-Veranstaltungsorts bilden gemeinsam die Servicescape."},
+
+{m:"vdl",t:"Formen der Interaktion",
+ def:"Interaktion meint körperliche und gedankliche Aktivitäten eines Akteurs, die auf Aktivitäten mit mindestens einem anderen Akteur und/oder Objekt bezogen sind. Interaktionen sind das Kernelement der Service-Co-Creation.",
+ kern:["<b>Soziale Interaktion:</b> geprägt durch den Kontext – soziale Normen (subjektive und deskriptive), das Behavioral Setting, die wahrgenommene Ähnlichkeit und die soziale Distanz (öffentliche, soziale, persönliche, intime Distanzzone).",
+   "<b>Objektbezogene Interaktion:</b> mit physischen und digitalen Objekten, einschließlich Technologienutzung.",
+   "<b>Kommunikation:</b> unterscheidet Inhalts- und Beziehungsebene, aufgabenbezogene (steuernde Prozessinformationen) und rituelle (nicht steuernde) Kommunikation sowie verbale und nonverbale Kommunikation. Emotionen verbreiten sich über emotionale Ansteckung."],
+ ex:"NotG: das persönliche Gespräch mit dem Empfangspersonal (soziale Interaktion) und die Bedienung der Event-App (objektbezogene Interaktion)."},
+
+{m:"vdl",t:"Post-Service: Service Failure, Beschwerde & -management",
+ def:"In der Post-Service-Phase bewerten die Akteur:innen die Dienstleistung nach; zentrale Themen sind Bewertung sowie Trinkgeld-, Lob- und Beschwerdeverhalten. Besonders prüfungsrelevant ist der Umgang mit Fehlern.",
+ kern:["<b>Service Failure:</b> eine Situation im DLP, in der aus Kundensicht ein Problem oder Fehler entsteht – unabhängig davon, wer oder was dafür verantwortlich ist.",
+   "<b>Beschwerde vs. Reklamation:</b> Eine Beschwerde ist eine verbale oder schriftliche Äußerung der Unzufriedenheit; bei einer Reklamation fordert der Kunde eine Kompensation, weil er glaubt, einen rechtlichen Anspruch zu haben. Für den Kunden entstehen Beschwerdekosten (z. B. Zeitverlust, Stress).",
+   "<b>Beschwerdemanagement (Service Recovery):</b> zielt auf drei Gerechtigkeitsdimensionen – Ergebnisgerechtigkeit (Problemlösung/Kompensation), Verfahrensgerechtigkeit (einfache, verschiedene Beschwerdekanäle) und Interaktionsgerechtigkeit (respektvoller Umgang mit dem Kunden)."],
+ ex:"NotG: lange Wartezeit am Einlass (Service Failure) → schnelle Lösung, mehrere niedrigschwellige Beschwerdekanäle und freundliche Kommunikation (Service Recovery über alle drei Gerechtigkeitsdimensionen)."},
+
+{m:"vdl",t:"Psychologische Bewertungsaspekte",
+ def:"Die Bewertung einer Dienstleistung durch Kund:innen ist kein rein objektiver Vorgang, sondern wird durch psychologische Effekte systematisch geprägt und verzerrt. Daraus lassen sich Handlungsmaßnahmen ableiten.",
+ kern:["<b>Zeitliche Abstimmung von Ereignissen:</b> Reihenfolge und Höhepunkte beeinflussen die Bewertung stark (Peak-End-Effekt – Höhepunkt und Ende prägen die Gesamterinnerung).",
+   "<b>Halo-Effekt:</b> ein einzelner stark wahrgenommener Eindruck überstrahlt die Gesamtbewertung.",
+   "<b>Referenzpunkte:</b> Bewertungen erfolgen relativ zu Erwartungen und Vergleichswerten.",
+   "<b>Kognitive Dissonanz:</b> das Bedürfnis nach Stimmigkeit von Erwartung und Erlebnis beeinflusst die nachträgliche Bewertung.",
+   "<b>Emotionen:</b> prägen Wahrnehmung und Erinnerung unmittelbar."],
+ ex:"Ein bewusst starkes Finale der NotG (Peak-End) hebt die Gesamtbewertung, selbst wenn es zwischendurch kleinere Schwächen gab."},
+
+/* ===================== TOURISMUS ===================== */
+{m:"tour",t:"Definition Tourismus (UNWTO 1993)",
+ def:"Tourismus umfasst nach der UNWTO-Definition (1993) alle Aktivitäten von Personen, die außerhalb ihrer gewohnten Umgebung reisen und sich dort aufhalten. Es handelt sich um eine nachfrageseitige Definition.",
+ kern:["<b>Konstitutive Kriterien:</b> außerhalb der gewohnten Umgebung, mindestens eine Übernachtung, maximale Aufenthaltsdauer ein Jahr.",
+   "<b>Reisezweck:</b> zu Freizeit-, Geschäfts- oder bestimmten anderen privaten Zwecken.",
+   "<b>Perspektive:</b> Nachfrageseite – die Definition beschreibt, was die Reisenden/Gäste tun, nicht, wer das Angebot erbringt."],
+ ex:"Eine dreitägige Städtereise nach Berlin ist Tourismus; der tägliche Weg zur Arbeit (gewohnte Umgebung, keine Übernachtung) dagegen nicht."},
+
+{m:"tour",t:"Tourismus vs. Tourismuswirtschaft",
+ def:"Tourismus und Tourismuswirtschaft beschreiben zwei Seiten desselben Phänomens: Tourismus ist das Reisephänomen (Nachfrage), die Tourismuswirtschaft ist die zugehörige Branche bzw. das Angebot.",
+ kern:["<b>Tourismus:</b> Nachfrageseite, inkl. touristischer und freizeitbezogener Reisen sowie Tagesausflüge – Leitfrage „Was machen die Gäste?“.",
+   "<b>Tourismuswirtschaft:</b> der institutionelle Teil – die Gesamtheit aller Unternehmen, die touristische Dienstleistungen produzieren und vermarkten (z. B. Hotellerie, Reisebüros, Transport). Leitfrage „Wer bietet was an?“.",
+   "<b>Charakter:</b> Die Tourismuswirtschaft ist der ökonomische Motor mit volkswirtschaftlicher Bedeutung (Umsatz, Beschäftigung, Wertschöpfung), oft mittelständisch geprägt und eine Querschnittsbranche."],
+ ex:"Der Wunsch und das Verhalten zu verreisen = Tourismus; das Reisebüro, das die Reise zusammenstellt und verkauft = Tourismuswirtschaft."},
+
+{m:"tour",t:"Tourismusorganisationen",
+ def:"Tourismusorganisationen bündeln Interessen, setzen Standards und koordinieren Akteure auf verschiedenen Ebenen – von international bis lokal.",
+ kern:["<b>International:</b> UNWTO (World Tourism Organization) – UN-Organisation für den weltweiten Tourismus.",
+   "<b>National (Deutschland):</b> DZT (Deutsche Zentrale für Tourismus – Auslandsmarketing für das Reiseziel Deutschland), DEHOGA (Hotel- und Gaststättenverband), DRV (Deutscher ReiseVerband), DTV (Deutscher Tourismusverband), BTW (Bundesverband der Deutschen Tourismuswirtschaft).",
+   "<b>Regional/lokal:</b> Tourismusverbände auf Landes-, regionaler und städtischer Ebene sowie weitere Organisationen (Vereine, Kirchen, Bildungseinrichtungen)."],
+ ex:"Die DZT bewirbt Deutschland als Reiseziel im Ausland; der DEHOGA vertritt die Interessen von Hotellerie und Gastronomie."},
+
+{m:"tour",t:"Leistungsträger, Reiseveranstalter & Reisemittler",
+ def:"Die touristische Leistungskette setzt sich aus Leistungsträgern, Reiseveranstaltern und Reisemittlern zusammen, die gemeinsam aus Einzelleistungen ein buchbares Reiseerlebnis machen.",
+ kern:["<b>Leistungsträger:</b> erbringen touristische Einzelleistungen (z. B. Hotellerie, Verkehr/Transport, Attraktionen, Gastronomie).",
+   "<b>Reiseveranstalter (RV):</b> bündeln Einzelleistungen zu einem neuen Produkt (Pauschal- oder Bausteinreise). Einordnungen: Konzern-RV, eigentümergeführte RV (Groß-/Mittelständler), Generalisten vs. Spezialisten, Reisebüros mit Eigenveranstaltungen, Gelegenheitsveranstalter.",
+   "<b>Reisemittler:</b> verkaufen die Leistungen offline oder online an die Endkunden (Reisende). Preise werden u. a. über Yieldmanagement nachfrageabhängig gesteuert."],
+ ex:"TUI als Reiseveranstalter bündelt Flug (Leistungsträger) und Hotel (Leistungsträger) zur Pauschalreise und verkauft sie über ein Reisebüro (Reisemittler) an den Endkunden."},
+
+{m:"tour",t:"Aspekte des Tourismus · Angebot & Nachfrage",
+ def:"Tourismus lässt sich aus mehreren Blickwinkeln analysieren; im Kern steht das Zusammenspiel von touristischem Angebot und Nachfrage sowie deren Einflussfaktoren.",
+ kern:["<b>Aspekte des Tourismus:</b> Angebot/Nachfrage, wirtschaftliche, gesellschaftlich-soziale, politische, ökologische und technologische Aspekte sowie Tourismusarten, -formen und -typen.",
+   "<b>Direktes touristisches Angebot:</b> Unterkünfte, Gastronomie, Sehenswürdigkeiten, Freizeit- und Erlebnisangebote, Events und Veranstaltungen sowie Infrastruktur/Mobilität (z. B. ÖPNV, Barrierefreiheit).",
+   "<b>Indirektes Angebot:</b> fördert den Tourismus mittelbar, z. B. Marketing/Werbekampagnen, Einzelhandel, allgemeine Infrastruktur. Einflussfaktoren (z. B. Wetter, Sicherheit, Preisniveau, Image) wirken auf Angebot und Nachfrage."],
+ ex:"Eine gute ÖPNV-Anbindung und gezieltes Destinationsmarketing (indirekt) steigern die Attraktivität der direkten Angebote vor Ort."},
+
+{m:"tour",t:"Tourismusarten, -formen & -typen",
+ def:"Tourismus wird nach Reisemotiven, -anlässen und -inhalten differenziert. Während Tourismusarten die Reiseform beschreiben, benennen Tourismustypen die zugehörigen Zielgruppen.",
+ kern:["<b>Tourismusarten (nach Motiv/Anlass):</b> z. B. Gesundheits-/Wellnesstourismus, Natur- und Ökotourismus, Sporttourismus, Kulturtourismus, Geschäftstourismus, Event-/Unterhaltungstourismus, Bildungstourismus, religiöser Tourismus, Sozialtourismus.",
+   "<b>Tourismustypen:</b> die jeweils typischen Zielgruppen (z. B. Geschäftsleute/Kongressteilnehmer, Familien, Best Ager, Studierende, Aktivurlauber).",
+   "<b>Bedeutung:</b> Reisemotiv und Zielgruppe bestimmen gemeinsam, wie das passende Angebot ausgestaltet werden muss."],
+ ex:"Sporttourismus (Art, Motiv „sportliche Betätigung“) zieht den Typ der aktiven Radfahrer, Wanderer und Marathonläufer an."},
+
+{m:"tour",t:"Destinationsmanagement (Definition, Aufgaben, DMO)",
+ def:"Destinationsmanagement ist die strategische Planung, Entwicklung, Koordination und Vermarktung einer Destination. Dabei wird die Destination als selbstständige, marktfähige Wettbewerbseinheit verstanden, die in Konkurrenz zu anderen Destinationen steht.",
+ kern:["<b>Aufgaben:</b> Vermarktung des Reiseziels, Lenkung der Reiseströme, Verwaltung des Tourismus am Reiseziel und Förderung der Zusammenarbeit der Leistungsträger.",
+   "<b>Träger:</b> die DMO (Destinationsmanagement-Organisation) als organisatorischer Träger und zentrale Koordinationsstelle.",
+   "<b>Tätigkeitsfelder:</b> planen, koordinieren, entwickeln, vermarkten – mit dem Ziel, Gästeerlebnis, Wettbewerbsfähigkeit, Nachhaltigkeit und Lebensqualität zu verbinden."],
+ ex:"Eine regionale DMO stimmt Hotels, Attraktionen, Verkehr und Marketing einer Ferienregion aufeinander ab, damit ein stimmiges Gesamterlebnis entsteht."},
+
+{m:"tour",t:"Ziele eines erfolgreichen Destinationsmanagements",
+ def:"Erfolgreiches Destinationsmanagement verfolgt nicht primär mehr Gäste, sondern verbindet vier gleichrangige Zieldimensionen zu einem ausgewogenen Gesamtergebnis.",
+ kern:["<b>Wettbewerbsfähigkeit:</b> klare Marke und stabile Nachfrage gegenüber konkurrierenden Destinationen.",
+   "<b>Wertschöpfung:</b> ökonomischer Nutzen durch Umsatz, Arbeitsplätze und Investitionen.",
+   "<b>Lebensqualität:</b> Akzeptanz des Tourismus bei den Einwohner:innen vor Ort.",
+   "<b>Nachhaltigkeit:</b> schonender Umgang mit Ressourcen und Resilienz der Destination. Leitsatz: Erfolg heißt Qualität und Balance – nicht nur mehr Gäste."],
+ ex:"Eine stark frequentierte Destination begrenzt aktiv die Gästezahlen, um Lebensqualität und Umwelt zu schützen, statt nur die Ankünfte zu maximieren."},
+
+{m:"tour",t:"Stakeholder & drei Perspektiven",
+ def:"Destinationsmanagement ist nötig, weil Gäste eine Destination als Gesamtprodukt erleben – nicht als Summe einzelner Anbieter. DM koordiniert dazu drei Perspektiven bzw. Stakeholdergruppen.",
+ kern:["<b>Nachfrage:</b> Gäste und Zielgruppen mit ihren Erwartungen.",
+   "<b>Angebot:</b> Betriebe und Infrastruktur (Leistungsträger).",
+   "<b>Lebensraum:</b> Einwohner:innen und Umwelt.",
+   "<b>Aufgabe:</b> DM bringt diese drei Perspektiven in Einklang, damit ein wettbewerbsfähiges, nachhaltiges und akzeptiertes Gesamtangebot entsteht."],
+ ex:"Proteste von Anwohner:innen gegen Massentourismus zeigen, dass die Lebensraum-Perspektive vernachlässigt wurde und das DM nachsteuern muss."},
+
+{m:"tour",t:"Fallbeispiel Amsterdam & Overtourism",
+ def:"Amsterdam ist ein Standardbeispiel für den Wandel vom reinen Stadtmarketing hin zum Besuchermanagement als Reaktion auf Overtourism.",
+ kern:["<b>Problem:</b> hohe Besucherintensität (Overtourism) mit negativen Folgen für Anwohner und Stadtraum.",
+   "<b>Ziel:</b> eine wertvollere Besucherökonomie statt reiner Mengenmaximierung.",
+   "<b>Maßnahmen:</b> Lenkung der Besucherströme, Regulierung und gezielte Kommunikation.",
+   "<b>Learning:</b> Destinationsmanagement ist immer auch Akzeptanzmanagement gegenüber der lokalen Bevölkerung."],
+ ex:"Amsterdam reduziert die Bewerbung des Party- und Massentourismus und lenkt Besucherströme aktiv auf andere Orte und Zeiten."},
+
+{m:"tour",t:"Nachhaltigkeit im Tourismus",
+ def:"Nachhaltiger Tourismus zielt darauf, ökologische, ökonomische und soziale Faktoren in ein ausgewogenes Verhältnis zu bringen (Dreieck bzw. Drei-Säulen der Nachhaltigkeit).",
+ kern:["<b>Akteursebene:</b> Reiseveranstalter und Leistungsträger handeln nachhaltig (z. B. CO₂-Reduktion, regionale Wertschöpfung, ressourcenschonende Angebote); Gäste handeln nachhaltig (z. B. Slow Travel, Nebensaison, umweltbewusste Verkehrsmittelwahl).",
+   "<b>Glaubwürdigkeit:</b> Nachhaltigkeitssiegel und Zertifizierungen (z. B. Travelife) schaffen Transparenz; Greenwashing zu vermeiden bedeutet, alle Dimensionen tatsächlich zu prüfen.",
+   "<b>Trend:</b> Regenerativer Tourismus geht über das bloße Vermeiden von Schäden hinaus und will der Destination aktiv etwas zurückgeben."],
+ ex:"Ein Reiseveranstalter weist die CO₂-Bilanz seiner Reisen transparent aus, arbeitet mit lokalen Partnern und lässt sich zertifizieren."},
+
+{m:"tour",t:"Trends in der Touristik (2025/26)",
+ def:"Die Touristik verändert sich entlang mehrerer Megatrends, auf die sich Tourismusdienstleister strategisch einstellen müssen.",
+ kern:["<b>Nachhaltigkeit:</b> regenerativer Tourismus, regionale Wertschöpfung, Slow Travel.",
+   "<b>Digitalisierung & KI:</b> Personalisierung, automatisierte Prozesse, durchgängige digitale Customer Journey.",
+   "<b>Erlebnisorientierung:</b> Experience Economy, authentische Erfahrungen, Individualreisen.",
+   "<b>Overtourism & neue Nischen:</b> Besucherlenkung, Stärkung der Nebensaison, alternative Ziele, Wellness/Gesundheit, Natur/Outdoor, Community-Tourismus.",
+   "<b>Strukturwandel:</b> Fachkräftemangel und neue Kompetenzanforderungen. Erfolgsformel: Digitalisierung + Nachhaltigkeit + Erlebnisorientierung."],
+ ex:"Ein Anbieter kombiniert KI-gestützte Personalisierung mit nachhaltigen, erlebnisorientierten Reisen, um sich im Wettbewerb zu differenzieren."},
+
+/* ===================== MESSEBAU ===================== */
+{m:"messe",t:"Definition Messe (AUMA & GewO §64)",
+ def:"Eine Messe ist eine zeitlich begrenzte, in der Regel wiederkehrende Veranstaltung, auf der Aussteller Produkte „nach Mustern“ präsentieren. Zwei Definitionen ergänzen sich: die rechtliche (GewO) und die marketingorientierte (AUMA).",
+ kern:["<b>GewO (§ 64):</b> rechtlich verbindliche Definition mit Fokus auf die gewerbliche Nutzung – das Zeigen von Produkten „nach Mustern“ dient der Veranschaulichung, nicht dem direkten Verkauf.",
+   "<b>AUMA</b> (Ausstellungs- und Messe-Ausschuss der Deutschen Wirtschaft): moderne Marketingperspektive – die Messe als Marketingplattform für Kommunikation, Innovation, Image, Beziehungen und Marktbeobachtung; es geht nicht nur um Verkauf.",
+   "<b>Zusammenspiel:</b> Die GewO ist gesetzlich notwendig, der AUMA liefert die zeitgemäße Marketingsicht – gemeinsam bilden sie das Fundament der Messebranche."],
+ ex:"Auf der Hannover Messe zeigen Aussteller Maschinen als Muster zur Veranschaulichung, nicht zum Sofortverkauf."},
+
+{m:"messe",t:"Funktionen von Messen",
+ def:"Messen sind multifunktionale und multisensorische Kommunikationsplattformen, deren besondere Stärke in der direkten persönlichen Begegnung liegt.",
+ kern:["Sie schaffen direkte Begegnung, Vertrauen und wertvolle Einblicke in Markt und Wettbewerb (Marktbeobachtung); das persönliche Gespräch ist durch nichts vollständig zu ersetzen.",
+   "Als Hybrid-Instrument verbinden sie persönliche Kommunikation mit medialer Reichweite und wirken oft über Jahre nach.",
+   "Ihre besondere emotionale Kraft beruht darauf, dass sie alle Sinne ansprechen (multisensorisch) – der Mensch ist ein multisensorisches Wesen."],
+ ex:"Ein Fachbesuch mit Produkterprobung am Stand schafft Vertrauen, das ein reiner Videocall nicht in gleicher Weise erzeugen kann."},
+
+{m:"messe",t:"Messeklassifikation",
+ def:"Messen werden nach Zielgruppe, Angebotsbreite und Reichweite systematisch eingeordnet; die Klassifikation ist zugleich eine strategische Entscheidung.",
+ kern:["<b>Zielgruppe:</b> B2B (Fachpublikum) vs. B2C (Endverbraucher); die Zielgruppe bestimmt das gesamte Konzept – von Design über Marketing bis zur Erfolgsmessung.",
+   "<b>Fachmessen dominieren</b> heute, weil sie gezielte Inhalte, klare Zielgruppen und hochwertige Kontakte bieten und damit für Aussteller besonders effizient sind.",
+   "<b>Angebotsbreite:</b> Horizontalmessen (branchenübergreifend, ermöglichen neue Synergien) vs. Vertikalmessen (eine Branche, bieten Tiefe und Spezialisierung). Dazu kommt die Reichweite (regional bis international)."],
+ ex:"Die Gamescom ist eine B2C-Eventmesse mit Entertainment-Charakter; die Hannover Messe ist eine internationale B2B-Fachmesse mit Technikfokus."},
+
+{m:"messe",t:"Brutto-/Nettofläche & Umwegrentabilität",
+ def:"Flächen- und Wirtschaftskennzahlen beschreiben einerseits die Auslastung einer Messe, andererseits ihre regionalwirtschaftliche Bedeutung.",
+ kern:["<b>Bruttofläche:</b> die gesamte belegte Fläche einer Halle bzw. eines Geländes – inklusive Ausstellungsstände, Gänge, Ruhezonen, Infoflächen, Gastronomie sowie Technik-/Sicherheitsflächen.",
+   "<b>Nettofläche:</b> nur die tatsächlich an Aussteller vermietete Standfläche – ohne Gänge, Gemeinschafts- und Servicebereiche. Ein hohes Verhältnis Netto zu Brutto gilt als wirtschaftlich effizient (viele Aussteller); ein niedriges Verhältnis bedeutet viele Freiflächen.",
+   "<b>Umwegrentabilität:</b> die indirekte regionale Wertschöpfung – Aussteller und Besucher fragen Leistungen in vielen Sektoren nach (Übernachtung, Gastronomie, Reise, Standbau), was Produktions-, Beschäftigungs- und Steuereffekte am Veranstaltungsort auslöst."],
+ formel:"Auslastung ≈ Nettofläche ÷ Bruttofläche",
+ ex:"Übernachtungen, Restaurantbesuche und Taxifahrten der Messegäste sind Umwegrentabilität für die Wirtschaft der Messestadt."},
+
+{m:"messe",t:"Messeakteure (Ökosystem)",
+ def:"Eine Messe ist ein Ökosystem, in dem viele Akteure zusammenwirken; der Erfolg hängt von der professionellen Zusammenarbeit aller Beteiligten ab.",
+ kern:["<b>Veranstalter</b> prägen die Messe maßgeblich über Konzept, Umsetzung und Besucherbindung – öffentliche Veranstalter (viele große Leitmessen) vs. private Veranstalter (oft flexibler).",
+   "<b>Aussteller</b> kommen mit klaren Zielen und hohen Erwartungen an Sichtbarkeit, Professionalität und Kontakte; die Messebeteiligung ist für viele ein großer Budgetposten.",
+   "<b>Besucher</b> investieren Zeit und Geld und erwarten echte Mehrwerte; gerade jüngere Besucher wollen „Erlebnis plus Inhalt“. Ein gutes Messekonzept muss beide Interessen vereinen."],
+ ex:"Die Frankfurter Buchmesse (öffentlichkeitsnah, mit Gastland-Konzept) lebt vom Zusammenspiel aus Veranstalter, Ausstellern, Besuchern und Dienstleistern."},
+
+{m:"messe",t:"Ziele der Messebeteiligung",
+ def:"Unternehmen nutzen eine Messe meist, um mit einem Auftritt mehrere Ziele gleichzeitig zu erreichen; klare, messbare Ziele sind die Grundlage des Erfolgs.",
+ kern:["<b>Typische Ziele:</b> Neukundengewinnung/Leadgenerierung, Markenbekanntheit und Imagepflege, Netzwerk- und Beziehungspflege sowie Pressearbeit.",
+   "<b>Messbarkeit:</b> Ohne klar definierte Ziele wird die Messebeteiligung zum „Blindflug“ – Unternehmen sollten vorab wissen, was sie erreichen wollen und wie sie es messen können."],
+ ex:"Ein Start-up legt als messbares Ziel „100 qualifizierte Leads und drei Pressekontakte“ fest und richtet Stand und Personaleinsatz darauf aus."},
+
+{m:"messe",t:"Messeauswahl",
+ def:"Die Auswahl der richtigen Messe ist ein strategischer Schritt und entscheidet maßgeblich über den Erfolg der Beteiligung – denn nicht jede Messe passt zu jedem Unternehmen.",
+ kern:["<b>Auswahlkriterien:</b> Zielgruppe/Besucherstruktur, Branche, Reichweite und Standort der Messe.",
+   "<b>Werkzeug:</b> Die AUMA-Datenbank ist das zentrale Tool zur Messeauswahl und liefert Kennzahlen, Besucherstruktur und Hallenpläne als Entscheidungsgrundlage."],
+ ex:"Ein Technologie-Start-up wählt die IFA Next, weil sie als internationale Innovationsplattform genau die gewünschte Zielgruppe und Sichtbarkeit bietet."},
+
+{m:"messe",t:"Beteiligungsformen & Budgetierung",
+ def:"Die Beteiligungsform ist eine strategische Entscheidung, die von Budget, Ziel und Positionierung abhängt; entsprechend reicht das Spektrum von schlanker bis umfassender Beteiligung.",
+ kern:["<b>Formen:</b> von schlanken Beteiligungen (z. B. Verbands-/Gemeinschaftsflächen, attraktiv vor allem für Start-ups) bis zu umfassenden Einzelauftritten von Konzernen.",
+   "<b>Budgetposten:</b> Standmiete, Standbau, Reise/Personal und Werbung – sowie das häufig vergessene Lead-Nachfass-System; „das Danach gehört zum Budget“.",
+   "<b>Planung:</b> Eine Messe braucht fast ein Jahr Vorlaufzeit und professionelles Projektmanagement; wer zu spät plant, verliert Geld und Wirkung."],
+ formel:"Beispielbudget (Orientierung):\n• Standmiete       ~6.000–8.000 €\n• Standbau         ~10.000 €\n• Reise/Personal   3.000–5.000 €\n• Werbung etc.     ~2.000 €",
+ ex:"Ein KMU nutzt eine Gemeinschaftsfläche eines Verbandes, um Kosten zu senken und dennoch professionell aufzutreten."},
+
+{m:"messe",t:"Standtypen",
+ def:"Standtypen unterscheiden sich nach der Anzahl der offenen Seiten; als Faustregel gilt: mehr offene Seiten bedeuten mehr Sichtbarkeit, aber auch höheren Aufwand und höhere Kosten.",
+ kern:["<b>Reihenstand:</b> nur eine offene Seite – der günstige Klassiker mit begrenzter Wirkung; gute Kommunikation muss hier durch Gestaltung erzeugt werden.",
+   "<b>Eckstand</b> (zwei offene Seiten) und <b>Kopfstand</b> (drei offene Seiten) sind deutlich sichtbarer.",
+   "<b>Block-/Inselstand:</b> an allen vier Seiten offen, volle Gestaltungsfreiheit, aufwendiger und teurer – ideal für Markeninszenierung. Die Wahl hängt von Ziel, Budget und gewünschter Aufmerksamkeit ab."],
+ ex:"Ein Gaming-Start-up wählt für die Gamescom einen Eck- oder Kopfstand für hohe Sichtbarkeit und ergänzt eine Interaktions- bzw. Erlebniszone."},
+
+{m:"messe",t:"Standgestaltung & Design",
+ def:"Der Messestand ist ein strategisches Werkzeug und die „Körpersprache der Marke“ – Bühne, Treffpunkt und Markenerlebnis zugleich. Der erste Eindruck entscheidet in Sekunden über Stehenbleiben oder Weitergehen.",
+ kern:["<b>Multisensorisches Design:</b> Farben steuern unbewusst Orientierung und Emotion; Licht schafft Atmosphäre und inszeniert Produkte; Haptik erhöht Verweildauer und Erinnerung; digitale Elemente ziehen an, müssen aber sinnvoll eingebettet sein.",
+   "<b>Besucherführung & Zonierung:</b> Ein guter Stand „führt“ Besucher intuitiv. Bewährte Zonen: Empfangsbereich vorne, Erlebniszone mittig, abgeschirmte Gesprächszonen, ggf. Rückwand mit Markenfilm.",
+   "<b>Markenarchitektur:</b> Statt reiner Produktliste zählt eine Erlebniswelt mit Storytelling und rotem Faden, die zur Marke passt und zum Besucher spricht."],
+ ex:"Porsche inszeniert auf der IAA das Thema Nachhaltigkeit als durchgängige Erlebniswelt mit klarem roten Faden statt als bloße Produktschau."},
+
+{m:"messe",t:"Modularer vs. individueller Messebau",
+ def:"Der Standbau kann modular (aus vorgefertigten Bausteinen) oder individuell (maßgeschneidert) erfolgen; beide Varianten haben klare Vor- und Nachteile.",
+ kern:["<b>Modularer Messebau:</b> vorgefertigte Module für Wand, Decke und Licht – schnell, kostensparend, wiederverwendbar und umweltfreundlich; durch individuelle Elemente dennoch visuell stark.",
+   "<b>Individueller Messebau:</b> stärkere Wirkung und volle Gestaltungsfreiheit, jedoch aufwendiger und teurer.",
+   "<b>Trend:</b> Nachhaltigkeit wird zum Standard, was modulare und wiederverwendbare Lösungen zusätzlich attraktiv macht."],
+ ex:"Ein Start-up nutzt einen modularen Grundstand und setzt mit wenigen individuellen Markenelementen gezielte Akzente."},
+
+{m:"messe",t:"Standpersonal, Kommunikation & Leadmanagement",
+ def:"Der Messeerfolg entsteht durch Menschen und eine strukturierte Verarbeitung der Kontakte – ein Messestand funktioniert nur im gut vorbereiteten Team.",
+ kern:["<b>Standpersonal:</b> repräsentiert die Marke; oft entscheidet die Person am Empfang über den ersten Eindruck. Kommunikation beginnt vor dem ersten Wort – Körpersprache, Blickkontakt und Offenheit entscheiden über Aufmerksamkeit oder Ablehnung.",
+   "<b>Gesprächsdramaturgie:</b> Jedes Standgespräch folgt einer Dramaturgie, vergleichbar mit einem kurzen Verkaufsgespräch unter Zeitdruck; ein offener Auftritt lädt eher zum Ansprechen ein.",
+   "<b>Leadmanagement-Ablauf:</b> Gespräch am Stand → Qualifikation (Bedarf, Entscheidungsrolle, Timing) → Erfassung (digital oder analog) → Start des Follow-up-Prozesses. Nicht jeder Kontakt ist gleich wertvoll, deshalb ist die Qualifikation entscheidend."],
+ ex:"Am Stand wird ein Interessent nach Bedarf und Entscheidungsrolle qualifiziert, digital erfasst und nach der Messe gezielt nachgefasst."},
+
+{m:"messe",t:"Nachhaltigkeit & Evaluation im Messewesen",
+ def:"Die Messe von morgen ist ökologisch, digital und evaluiert; Nachhaltigkeit und Erfolgsmessung sind keine Add-ons mehr, sondern Pflicht und Erwartung.",
+ kern:["<b>Nachhaltigkeit:</b> betrifft alle Bereiche – Design, Materialien, Catering und Logistik; Maßnahmen sind z. B. reduzierte Materialien, digitale Kommunikation, nachhaltiges Catering, gemeinsame Logistik und lokale Partner. Zertifizierungen schaffen Glaubwürdigkeit, und Greenwashing zu vermeiden heißt, alle Dimensionen zu prüfen.",
+   "<b>Digitalisierung:</b> Hybride Formate erweitern die Messe und machen sie inklusiver und zeitunabhängiger, ersetzen die persönliche Begegnung aber nicht – was digital fehlt, ist Atmosphäre und das Ungeplante.",
+   "<b>Evaluation:</b> macht den Messeerfolg messbar – „eine Messe ohne Evaluation ist wie ein Marathon ohne Zielzeit“. Es gilt: Quantität ≠ Qualität; wer gut nachbereitet, gewinnt oft mehr."],
+ ex:"Ein Aussteller setzt auf reduzierte Materialien und ein digitales Catering-Konzept und wertet anschließend Leads und Kontaktqualität systematisch aus."}
+];
+
+/* ============ RENDER ============ */
+const main = document.getElementById('main');
+const empty = document.getElementById('empty');
+const search = document.getElementById('search');
+const clearBtn = document.getElementById('clear');
+const mbtns = [...document.querySelectorAll('.mbtn')];
+let activeMod = 'vdl';
+
+const counts = {vdl:0,tour:0,messe:0};
+DATA.forEach(d=>counts[d.m]++);
+document.getElementById('c-vdl').textContent = counts.vdl + ' Themen';
+document.getElementById('c-tour').textContent = counts.tour + ' Themen';
+document.getElementById('c-messe').textContent = counts.messe + ' Themen';
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function build(){
+  main.innerHTML='';
+  ['vdl','tour','messe'].forEach(mod=>{
+    const M = MODULES[mod];
+    const sec = document.createElement('section');
+    sec.className = 'modsec';
+    sec.dataset.mod = mod;
+    const head = document.createElement('div');
+    head.className = 'mod-head '+M.cls;
+    head.innerHTML = `<div class="bar"></div><div><h2>${M.name}</h2><div class="sub">${M.sub}</div></div>`;
+    sec.appendChild(head);
+    DATA.map((d,i)=>({d,i})).filter(x=>x.d.m===mod).forEach((x,idx)=>{
+      const d = x.d;
+      const card = document.createElement('article');
+      card.className = 'card '+mod;
+      card.dataset.search = (d.t+' '+d.def+' '+d.kern.join(' ')+' '+(d.ex||'')).toLowerCase();
+      let html = `<button class="card-btn" aria-expanded="false">
+        <span class="num">${idx+1}</span><span class="ttl">${d.t}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button><div class="body">`;
+      html += `<div class="def">${d.def}</div>`;
+      html += `<div class="lbl">Kernaussagen</div><ul class="kern">${d.kern.map(k=>`<li>${k}</li>`).join('')}</ul>`;
+      if(d.formel){html += `<div class="lbl">Formel / Kennzahl</div><div class="formula">${esc(d.formel)}</div>`;}
+      if(d.ex){html += `<div class="lbl">Standardbeispiel</div><div class="ex">${d.ex}</div>`;}
+      html += `</div>`;
+      card.innerHTML = html;
+      const btn = card.querySelector('.card-btn');
+      btn.addEventListener('click',()=>{
+        const open = card.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+      });
+      sec.appendChild(card);
+    });
+    main.appendChild(sec);
+  });
+  update();
+}
+
+function update(){
+  const q = search.value.trim().toLowerCase();
+  clearBtn.classList.toggle('show', q.length>0);
+  const searching = q.length>0;
+  let anyVisible = false;
+
+  main.querySelectorAll('.modsec').forEach(sec=>{
+    const mod = sec.dataset.mod;
+    let secHasVisible = false;
+    sec.querySelectorAll('.card').forEach(c=>{
+      let show;
+      if(searching){
+        show = c.dataset.search.includes(q);
+        if(show){c.classList.add('open');c.querySelector('.card-btn').setAttribute('aria-expanded','true');highlight(c,q);}
+      } else {
+        show = (mod===activeMod);
+        c.classList.remove('open');c.querySelector('.card-btn').setAttribute('aria-expanded','false');removeHighlight(c);
+      }
+      c.classList.toggle('hidden', !show);
+      if(show) secHasVisible = true;
+    });
+    // section visible if: searching & has matches, OR browsing & is active module
+    const secVisible = searching ? secHasVisible : (mod===activeMod);
+    sec.classList.toggle('hidden', !secVisible);
+    if(secVisible) anyVisible = true;
+  });
+  empty.classList.toggle('show', !anyVisible);
+}
+
+function highlight(card,q){
+  removeHighlight(card);
+  const ttl = card.querySelector('.ttl');
+  const re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+  if(ttl && ttl.textContent.toLowerCase().includes(q)){
+    ttl.innerHTML = ttl.textContent.replace(re,'<mark>$1</mark>');
+  }
+}
+function removeHighlight(card){
+  const ttl = card.querySelector('.ttl');
+  if(ttl && ttl.querySelector('mark')) ttl.innerHTML = ttl.textContent;
+}
+
+mbtns.forEach(b=>b.addEventListener('click',()=>{
+  // tapping a module clears search and shows that module
+  if(search.value){search.value='';}
+  mbtns.forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  activeMod = b.dataset.m;
+  window.scrollTo({top:0,behavior:'auto'});
+  update();
+}));
+search.addEventListener('input', update);
+clearBtn.addEventListener('click',()=>{search.value='';search.focus();update();});
+
+build();
+</script>
+</body>
+</html>
